@@ -5,43 +5,6 @@ import _ from "underscore";
 import sample from "./sample-source.txt?raw";
 import blacklist from "./sample-blacklist.txt?raw";
 
-// const NOT_COLOR = [
-// 	'Apron',
-// 	'Bag',
-// 	'Bassinet',
-// 	'Bath',
-// 	'Beanbag',
-// 	'Bed',
-// 	'Blanket',
-// 	'Body',
-// 	'Cloth',
-// 	'Comforter',
-// 	'Cotton',
-// 	'Cover',
-// 	'Coverlet',
-// 	'Double',
-// 	'European',
-// 	'Fabric',
-// 	'Faux Fur',
-// 	'Filled',
-// 	'Fitted',
-// 	'King',
-// 	'Lotion',
-// 	'Mat',
-// 	'Mega',
-// 	'Multi',
-// 	'Pillowcase',
-// 	'Pillowsham',
-// 	'Poncho',
-// 	'Quilt',
-// 	'Sheet',
-// 	'Standard',
-// 	'Tablecloth',
-// 	'Tote Bag',
-// 	'Towel',
-// 	'V-Shape',
-// ];
-
 function App() {
 
 	const [Rules, setRules] = useState({
@@ -126,13 +89,19 @@ function App() {
 	}, [Rules]);
 
 	return (
-		<div className='container my-4'>
+		<div className='container-fluid my-4'>
 			<div className="row">
-				<div className="col-md-6">
+				<div className="sidebar" style={{ width: '400px' }}>
 					<h3>Source</h3>
-					<textarea type="text" className='form-control mb-3' onChange={e => setSource(e.target.value)} value={Source} rows={10} cols={100} ></textarea>
-				</div>
-				<div className="col-md-6">
+					<textarea
+						type="text"
+						className='form-control mb-3'
+						onChange={e => setSource(e.target.value)}
+						value={Source}
+						rows={10} cols={100}
+						style={{ whiteSpace: 'nowrap', fontSize: '0.875em' }}
+					></textarea>
+
 					<h3>Rules</h3>
 					<div className="rules__item form-check">
 						<input className='form-check-input' type="checkbox" id="distance" checked={Rules.distance.enabled} onChange={e => changeRule('distance', 'enabled', e.target.checked)} />
@@ -163,13 +132,11 @@ function App() {
 
 					<button className='btn btn-primary mt-3' onClick={process}>Process</button>
 				</div>
+				<div className="content col-auto">
+					<h3>Result</h3>
+					<pre>{Result.map(g => g.join("\r\n")).join("\r\n\r\n")}</pre>
+				</div>
 			</div>
-
-			<hr />
-
-			<h3>Result</h3>
-			<pre>{Result.map(g => g.join("\r\n")).join("\r\n\r\n")}</pre>
-
 
 			{ShowBLModal && <>
 				<div className="modal show" tabIndex="-1" style={{ display: 'block' }}>
