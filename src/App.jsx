@@ -2,18 +2,18 @@ import { useCallback, useState } from 'react'
 import levenshtein from 'fast-levenshtein';
 import { diffWords } from "diff";
 import _ from "underscore";
-import sample from "./sample-source.txt?raw";
-import blacklist from "./sample-blacklist.txt?raw";
+import sample1 from "./source-sample1.txt?raw";
+import blacklist from "./blacklist.txt?raw";
 
 function App() {
 
 	const [Rules, setRules] = useState({
 		distance: { enabled: true, max_distance: 15 },
 		startwords: { enabled: true, min_words: 2 },
-		lastwords: { enabled: true },
+		lastwords: { enabled: false },
 		blacklist: { enabled: true },
 	});
-	const [Source, setSource] = useState(sample);
+	const [Source, setSource] = useState(sample1);
 	const [Result, setResult] = useState([]);
 	const [Blacklist, setBlacklist] = useState(blacklist.split(/\r?\n/));
 
@@ -95,12 +95,21 @@ function App() {
 					<h3>Source</h3>
 					<textarea
 						type="text"
-						className='form-control mb-3 font-monospace'
+						className='form-control mb-2 font-monospace'
 						onChange={e => setSource(e.target.value)}
 						value={Source}
 						rows={10} cols={100}
 						style={{ whiteSpace: 'nowrap', fontSize: '14px' }}
 					></textarea>
+					<div className="samples mb-3">
+						<button className='btn btn-light btn-sm me-2' onClick={() => setSource(sample1)}>Sample Short</button>
+						<button className='btn btn-light btn-sm' onClick={() => {
+							import('./source-full.txt?raw').then(({ default: text }) => {
+								// console.log({text});
+								setSource(text);
+							})
+						}}>Sample Full</button>
+					</div>
 
 					<h3>Rules</h3>
 					<div className="rules__item form-check">
@@ -136,7 +145,7 @@ function App() {
 					<h3>Result</h3>
 					{/* <pre>{Result.map(g => g.join("\r\n")).join("\r\n\r\n")}</pre> */}
 					{Result.map((g, gindex) => {
-						return <div key={gindex} className='bg-body-secondary p-2 mb-2 font-monospace' style={{fontSize: '14px'}}>
+						return <div key={gindex} className={'p-2 mb-2 font-monospace ' + (g.length > 1 ? 'bg-body-secondary' : 'bg-warning-subtle')} style={{ fontSize: '14px' }}>
 							{g.map((item, itemindex) => {
 								return <div key={itemindex}>
 									<span className='me-2'>{item.title}</span>
