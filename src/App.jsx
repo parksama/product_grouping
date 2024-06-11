@@ -35,7 +35,7 @@ function App() {
 		console.log('Grouping products by title...');
 		products.forEach((p, index, all) => {
 			if (index == 0) {
-				groups[gid].push(p);
+				groups[gid].push({ title: p, distance: 0 });
 				return;
 			}
 
@@ -61,7 +61,7 @@ function App() {
 				(Rules.lastwords.enabled ? (lastdiff.added || lastdiff.removed) : true) &&
 				(Rules.blacklist.enabled ? !diff_has_blacklist : true)
 			) {
-				groups[gid].push(cur + '  +' + distance);
+				groups[gid].push({ title: cur, distance });
 
 				colors = [...colors, ...alldiff];
 				diffs.push([
@@ -71,7 +71,7 @@ function App() {
 			} else {
 				gid++;
 				groups[gid] = [];
-				groups[gid].push(cur + '  +' + distance)
+				groups[gid].push({ title: cur, distance })
 			}
 		});
 
@@ -89,17 +89,17 @@ function App() {
 	}, [Rules]);
 
 	return (
-		<div className='container-fluid my-4'>
+		<div className='container-fluid'>
 			<div className="row">
-				<div className="sidebar" style={{ width: '400px' }}>
+				<div className="sidebar pt-3 bg-dark-subtle" style={{ width: '400px', minHeight: '100vh' }}>
 					<h3>Source</h3>
 					<textarea
 						type="text"
-						className='form-control mb-3'
+						className='form-control mb-3 font-monospace'
 						onChange={e => setSource(e.target.value)}
 						value={Source}
 						rows={10} cols={100}
-						style={{ whiteSpace: 'nowrap', fontSize: '0.875em' }}
+						style={{ whiteSpace: 'nowrap', fontSize: '14px' }}
 					></textarea>
 
 					<h3>Rules</h3>
@@ -107,7 +107,7 @@ function App() {
 						<input className='form-check-input' type="checkbox" id="distance" checked={Rules.distance.enabled} onChange={e => changeRule('distance', 'enabled', e.target.checked)} />
 						<label htmlFor="distance" className='form-check-label'>Levenshtein distance</label>
 						<div className="input-group my-1">
-							<span className="input-group-text">Maximum distance</span>
+							<span className="input-group-text">Max distance</span>
 							<input type="number" className='form-control' value={Rules.distance.max_distance} onChange={e => changeRule('distance', 'max_distance', parseInt(e.target.value))} />
 						</div>
 					</div>
@@ -115,7 +115,7 @@ function App() {
 						<input className='form-check-input' type="checkbox" id="startwords" checked={Rules.startwords.enabled} onChange={e => changeRule('startwords', 'enabled', e.target.checked)} />
 						<label className='form-check-label' htmlFor="startwords">Same start words</label>
 						<div className="input-group my-1">
-							<span className="input-group-text">Minimum words</span>
+							<span className="input-group-text">Min words</span>
 							<input type="number" className='form-control' value={Rules.startwords.min_words} onChange={e => changeRule('startwords', 'min_words', parseInt(e.target.value))} />
 						</div>
 					</div>
@@ -130,11 +130,24 @@ function App() {
 						<button className='btn btn-link btn-sm p-0' onClick={() => setShowBLModal(true)}>Set Blacklist</button>
 					</div>
 
-					<button className='btn btn-primary mt-3' onClick={process}>Process</button>
+					<button className='btn btn-dark w-100 d-block mt-3 d-block' onClick={process}>Process</button>
 				</div>
-				<div className="content col-auto">
+				<div className="content col-auto pt-3">
 					<h3>Result</h3>
-					<pre>{Result.map(g => g.join("\r\n")).join("\r\n\r\n")}</pre>
+					{/* <pre>{Result.map(g => g.join("\r\n")).join("\r\n\r\n")}</pre> */}
+					{Result.map((g, gindex) => {
+						return <div key={gindex} className='bg-body-secondary p-2 mb-2 font-monospace' style={{fontSize: '14px'}}>
+							{g.map((item, itemindex) => {
+								return <div key={itemindex}>
+									<span className='me-2'>{item.title}</span>
+									<span
+										style={{ color: item.distance > Rules.distance.max_distance ? 'red' : 'green' }}>
+										+{item.distance}
+									</span>
+								</div>
+							})}
+						</div>
+					})}
 				</div>
 			</div>
 
